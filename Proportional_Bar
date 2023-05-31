@@ -8,7 +8,6 @@ names(dt_all_pcb_homolog_bar)
 dt_all_pcb_homolog_bar<-dt_all_pcb_homolog_bar[,c(1:11)]
 dt_all_pcb_homolog_bar<-melt(dt_all_pcb_homolog_bar,id.vars=c("SYS_LOC_CODE"),measure.vars=c(2:11),
                        variable.name="CHEMICAL_NAME",value.name="PROPORTION",variable.factor=FALSE)
-fwrite(dt_all_pcb_homolog_bar,"dt_all_pcb_homolog_bar.csv")
 
 dt_all_pbde_homolog_bar<-fread("dt_all_pbde_homolog.csv")
 names(dt_all_pbde_homolog_bar)
@@ -17,7 +16,6 @@ names(dt_all_pbde_homolog_bar)
 dt_all_pbde_homolog_bar<-dt_all_pbde_homolog_bar[,c(1:10)]
 dt_all_pbde_homolog_bar<-melt(dt_all_pbde_homolog_bar,id.vars=c("SYS_LOC_CODE"),measure.vars=c(2:10),
                        variable.name="CHEMICAL_NAME",value.name="PROPORTION",variable.factor=FALSE)
-fwrite(dt_all_pbde_homolog_bar,"dt_all_pbde_homolog_bar.csv")
 
 #BARPLOT OF PCB & PBDE
 library(ggplot2)
