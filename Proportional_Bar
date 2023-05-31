@@ -1,0 +1,59 @@
+#PROPORTION OF "dt_all_pcb_homolog.csv" & "dt_all_pbde_homolog.csv"
+library(data.table)
+setwd("C:/Users/joseph.kim/OneDrive - Ocean Wise Conservation Association/Desktop/Computer Software/R/PTP DATA/Contaminants in Concern/2. Data Analysis/FIGURE 2 (Modified)")
+dt_all_pcb_homolog_bar<-fread("dt_all_pcb_homolog.csv")
+names(dt_all_pcb_homolog_bar)
+dt_all_pcb_homolog_bar[,c(2:11):=lapply(.SD,function(x){x/dt_all_pcb_homolog_bar$TOTALCB}),.SDcols=c(2:11)]
+names(dt_all_pcb_homolog_bar)
+dt_all_pcb_homolog_bar<-dt_all_pcb_homolog_bar[,c(1:11)]
+dt_all_pcb_homolog_bar<-melt(dt_all_pcb_homolog_bar,id.vars=c("SYS_LOC_CODE"),measure.vars=c(2:11),
+                       variable.name="CHEMICAL_NAME",value.name="PROPORTION",variable.factor=FALSE)
+fwrite(dt_all_pcb_homolog_bar,"dt_all_pcb_homolog_bar.csv")
+
+dt_all_pbde_homolog_bar<-fread("dt_all_pbde_homolog.csv")
+names(dt_all_pbde_homolog_bar)
+dt_all_pbde_homolog_bar[,c(2:10):=lapply(.SD,function(x){x/dt_all_pbde_homolog_bar$TOTALBDE}),.SDcols=c(2:10)]
+names(dt_all_pbde_homolog_bar)
+dt_all_pbde_homolog_bar<-dt_all_pbde_homolog_bar[,c(1:10)]
+dt_all_pbde_homolog_bar<-melt(dt_all_pbde_homolog_bar,id.vars=c("SYS_LOC_CODE"),measure.vars=c(2:10),
+                       variable.name="CHEMICAL_NAME",value.name="PROPORTION",variable.factor=FALSE)
+fwrite(dt_all_pbde_homolog_bar,"dt_all_pbde_homolog_bar.csv")
+
+#BARPLOT OF PCB & PBDE
+library(ggplot2)
+dt_all_pcb_homolog_bar<-fread("dt_all_pcb_homolog_bar.csv")
+dt_all_pbde_homolog_bar<-fread("dt_all_pbde_homolog_bar.csv")
+dt_location_id<-fread("dt_location_id.csv")
+str(dt_all_pcb_homolog_bar$CHEMICAL_NAME)
+levels(as.factor(dt_all_pcb_homolog_bar$CHEMICAL_NAME))
+level_order<-dt_location_id$SYS_LOC_CODE
+gr_pcb_proportion<-ggplot(dt_all_pcb_homolog_bar,aes(x=factor(SYS_LOC_CODE,level=level_order),y=PROPORTION,fill=factor(CHEMICAL_NAME,level=c("1-Cl","2-Cl","3-Cl","4-Cl","5-Cl","6-Cl","7-Cl","8-Cl","9-Cl","10-Cl"))))+ 
+                           geom_bar(stat="identity")+
+                           labs(title="",x="",y="Proportion\n")+
+                           scale_fill_manual(name="Homolog",values=c("darkmagenta","blue4","dodgerblue1","lightslateblue","forestgreen","palegreen1","gold1","darkorange1","firebrick1","lightcoral"))+
+                           scale_y_continuous(limits=c(0,1.01),expand=expansion(mult=c(0,0)))+
+                           theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))+
+                           theme(axis.ticks.x=element_blank())+
+                           theme(legend.justification="left")+
+                           theme(text=element_text(family="Times New Roman",size=12))+
+                           theme(plot.margin=unit(c(1.5,1.5,1.5,1.5),"lines"))
+gr_pcb_proportion
+
+str(dt_all_pbde_homolog_bar$CHEMICAL_NAME)
+levels(as.factor(dt_all_pbde_homolog_bar$CHEMICAL_NAME))
+gr_pbde_proportion<-ggplot(dt_all_pbde_homolog_bar,aes(x=factor(SYS_LOC_CODE,level=level_order),y=PROPORTION,fill=factor(CHEMICAL_NAME,level=c("2-Br","3-Br","4-Br","5-Br","6-Br","7-Br","8-Br","9-Br","10-Br"))))+ 
+                            geom_bar(stat="identity")+
+                            labs(title="",x="Site",y="Proportion\n")+
+                            scale_fill_manual(name="Homolog",values=c("blue4","dodgerblue1","lightslateblue","forestgreen","palegreen1","gold1","darkorange1","firebrick1","lightcoral"))+
+                            scale_y_continuous(limits=c(0,1.01),expand=expansion(mult=c(0,0)))+
+                            theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))+
+                            theme(axis.ticks.x=element_blank())+
+                            theme(legend.justification="left")+
+                            theme(text=element_text(family="Times New Roman",size=12))+
+                            theme(plot.margin=unit(c(1.5,1.5,1.5,1.5),"lines"))
+gr_pbde_proportion
+
+#ARRANGE gr_pcb_proportion & gr_pbde_proportion together
+library(ggpubr)
+gr_figure_2<-ggarrange(gr_pcb_proportion,gr_pbde_proportion,labels=c("a)","b)"),font.label=list(size=14,face="plain",color="black"),ncol=1,nrow=2,align="v")
+gr_figure_2
